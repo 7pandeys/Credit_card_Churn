@@ -1,0 +1,27 @@
+repos:
+
+  # pre-commit checks
+  -   repo: https://github.com/pre-commit/pre-commit-hooks
+      rev: v3.2.0
+      hooks:
+      -   id: trailing-whitespace         # Removes extra whitespaces in the code
+      -   id: end-of-file-fixer           # Adds empty string at the end of file
+      -   id: check-yaml                  # Checks structure of all yaml files
+      -   id: detect-private-key          # Checks for the presence of private key getting accidentally committed
+      -   id: check-merge-conflict        # Checks for the presence of merge conflicts in code files
+      -   id: check-added-large-files     # Ensures no large files are committed by default
+      -   id: check-case-conflict         # Checks for case-conflicting filenames in codebase
+
+  # black - black code formatter to format the Python code automatically
+  -   repo: https://github.com/psf/black
+      rev: 23.9.1
+      hooks:
+      -   id: black
+          args: [--line-length=120]
+
+  # ruff - ruff code linting framework
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.0.287
+    hooks:
+        - id: ruff
+          args: [ --fix, --exit-non-zero-on-fix, --ignore=E501 ]

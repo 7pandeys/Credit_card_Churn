@@ -1,3 +1,17 @@
+- Recommended: ![Static Badge](https://img.shields.io/badge/any_text-3.10-blue?style=plastic&logo=python&logoColor=yellow&label=Python&labelColor=grey&color=3776AB)
+- Minimum: ![Static Badge](https://img.shields.io/badge/any_text-3.9-blue?style=plastic&logo=python&logoColor=yellow&label=Python&labelColor=grey&color=3776AB)
+- Maximum: ![Static Badge](https://img.shields.io/badge/any_text-3.11-blue?style=plastic&logo=python&logoColor=yellow&label=Python&labelColor=grey&color=3776AB)
+- Recommended 
+  - ![Static Badge](https://img.shields.io/badge/any_text-1.5.6-blue?style=plastic&logo=terraform&logoColor=blueviolet&label=Terraform&labelColor=white&color=blueviolet)
+  - ![Static Badge](https://img.shields.io/badge/any_text-0.50.12-blue?style=plastic&logo=terragrunt&logoColor=blueviolet&label=Terragrunt&labelColor=white&color=blueviolet)
+- Minimum
+  - ![Static Badge](https://img.shields.io/badge/any_text-1.0.1-blue?style=plastic&logo=terraform&logoColor=blueviolet&label=Terraform&labelColor=white&color=blueviolet)
+  - ![Static Badge](https://img.shields.io/badge/any_text-0.39.2-blue?style=plastic&logo=terragrunt&logoColor=blueviolet&label=Terragrunt&labelColor=white&color=blueviolet)
+- Maximum
+  - ![Static Badge](https://img.shields.io/badge/any_text-1.6.0-blue?style=plastic&logo=terraform&logoColor=blueviolet&label=Terraform&labelColor=white&color=blueviolet)
+  - ![Static Badge](https://img.shields.io/badge/any_text-0.52.1-blue?style=plastic&logo=terragrunt&logoColor=blueviolet&label=Terragrunt&labelColor=white&color=blueviolet)
+
+
 # Predict Customer Churn
 
 - Project **Predict Customer Churn** of ML DevOps Engineer Nanodegree Udacity
@@ -25,3 +39,6 @@ requirements_py3.6.txt
 
 - To test churn_library.py functionalities and implementation
 `ipython churn_script_logging_and_tests.py`
+
+## Reference
+- Badge - https://javascript.plainenglish.io/how-to-make-custom-language-badges-for-your-profile-using-shields-io-d2aeaf016b6b

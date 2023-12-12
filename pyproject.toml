@@ -1,8 +1,8 @@
 [tool.poetry]
-name = "Customer Churn"
+name = "dds-vizion"
 version = "0.1.2"
-description = "Customer Churn"
-authors = ["Sandeep Pandey <7pandeys@gmail.com>"]
+description = "Dyson Data Science computer vision"
+authors = ["Daniel Low <daniel.low@dyson.com>", "Rodrigo Agundez <rodrigo.agundez@dyson.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
@@ -10,7 +10,8 @@ python = ">3.9 <3.11"
 pandas = "^2.1.1"
 numpy = "^1.26.0"
 scikit-image = "^0.21.0"
-opencv-python = "^4.8.1.78"
+uvicorn = "*"
+fastapi = "*"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.9.1"

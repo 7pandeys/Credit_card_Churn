@@ -1,15 +1,25 @@
+# Use a specific Python image
 FROM python:3.10.13-slim
 
-RUN pip install poetry
+# Set Poetry environment
+RUN pip install poetry \
+    && poetry config virtualenvs.create false
 
-WORKDIR /vizion
+# Set working directory
+WORKDIR /app
 
-COPY . .
+# Copy only the necessary files
+COPY pyproject.toml poetry.lock ./
 
+# Install dependencies
 RUN poetry install
 
-RUN poetry config virtualenvs.create false
+# Copy the entire source code
+COPY ./app /app
 
-EXPOSE 80
+# Expose the necessary port
+EXPOSE 8080
 
-# ENTRYPOINT ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8030" ]"
+# Entrypoint for your application
+ENTRYPOINT ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
+

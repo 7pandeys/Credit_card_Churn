@@ -1,35 +1,46 @@
 substitutions:
   _HOST_NAME: europe-west2-docker.pkg.dev
   _FOLDER: docker
-  _TEST: v1
-  _IMAGE_NAME: vizion
+  _IMAGE_NAME: vizion  
+  _TEST: Axfbc
 
 steps:
 
-# Step 1: Scan formatting and lin
-  - name: 'python:3.10.5'
+# Step 1: Scan formatting and linting, pytest
+  - name: 'python:3.10.13-slim'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
         source ./run-ci.sh
 
-# Step 2: Build and push the Docker image
+# # Step 2: Build and push the Docker image
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
         if [[ "$TAG_NAME" = ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-          docker build --network=cloudbuild -t ${_HOST_NAME}/${PROJECT_ID}/${_FOLDER}/${_IMAGE_NAME}:${TAG_NAME} .
+          docker build -t ${_HOST_NAME}/${PROJECT_ID}/${_FOLDER}/${_IMAGE_NAME}:${TAG_NAME} .
           # docker push ${_HOST_NAME}/${PROJECT_ID}/${_FOLDER}/${_IMAGE_NAME}:${TAG_NAME}
-        elif [[ "$SHORT_SHA" = ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-          docker build --network=cloudbuild -t ${_HOST_NAME}/${PROJECT_ID}/${_FOLDER}/${_IMAGE_NAME}:${SHORT_SHA} .
-          # docker push ${_HOST_NAME}/${PROJECT_ID}/${_FOLDER}/${_IMAGE_NAME}:${SHORT_SHA}
         else
-          docker build --network=cloudbuild -t ${_HOST_NAME}/${PROJECT_ID}/${_FOLDER}/${_IMAGE_NAME}:${_TEST} .
-          # docker push ${_HOST_NAME}/${PROJECT_ID}/${_FOLDER}/${_IMAGE_NAME}:${_TEST}
+          docker build -t ${_HOST_NAME}/${PROJECT_ID}/${_FOLDER}/${_IMAGE_NAME}:${_TEST} .
+          docker push ${_HOST_NAME}/${PROJECT_ID}/${_FOLDER}/${_IMAGE_NAME}:${_TEST}
         fi
+ 
+# Step 3: Deploy the Docker image to Cloud Run       
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # if [[ "$TAG_NAME" = ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        gcloud run deploy vizion \
+          --image=${_HOST_NAME}/${PROJECT_ID}/${_FOLDER}/${_IMAGE_NAME}:${_TEST} \
+          --platform=managed \
+          --region=${LOCATION} \
+          --allow-unauthenticated 
+        # fi
 
 options:
  logging: CLOUD_LOGGING_ONLY

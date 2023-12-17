@@ -1,12 +1,6 @@
-substitutions:
-  _HOST_NAME: europe-west2-docker.pkg.dev
-  _FOLDER: docker
-  _IMAGE_NAME: vizion  
-  _TEST: Axfbc
 
 steps:
-
-# Step 1: Scan formatting and linting, pytest
+  # Step 1: Scan formatting, linting, and run tests 
   - name: 'python:3.10.13-slim'
     entrypoint: 'bash'
     args:
@@ -14,33 +8,50 @@ steps:
       - |
         source ./run-ci.sh
 
-# # Step 2: Build and push the Docker image
+  # Step 2: Build and push Docker image
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
     args:
       - '-c'
-      - |
-        if [[ "$TAG_NAME" = ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-          docker build -t ${_HOST_NAME}/${PROJECT_ID}/${_FOLDER}/${_IMAGE_NAME}:${TAG_NAME} .
-          # docker push ${_HOST_NAME}/${PROJECT_ID}/${_FOLDER}/${_IMAGE_NAME}:${TAG_NAME}
-        else
-          docker build -t ${_HOST_NAME}/${PROJECT_ID}/${_FOLDER}/${_IMAGE_NAME}:${_TEST} .
-          docker push ${_HOST_NAME}/${PROJECT_ID}/${_FOLDER}/${_IMAGE_NAME}:${_TEST}
-        fi
- 
-# Step 3: Deploy the Docker image to Cloud Run       
-  - name: 'gcr.io/cloud-builders/gcloud'
+      - |   
+        # Build image tag based on branch and tag conditions
+        # if [[ "$BRANCH_NAME" = "main" ]] && [[ "$TAG_NAME" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        #   _TAG="$TAG_NAME"
+        # else
+        #   _TAG="$SHORT_SHA"
+        # fi
+        docker build --network=cloudbuild -t ${_IMAGE_NAME} .
+        docker tag $_IMAGE_NAME '${_DOCKER_ARTIFACTORY}${_TAG}'
+        docker push '${_DOCKER_ARTIFACTORY}${_TAG}'
+
+#   # Step 3: Deploy Docker image to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args: ['run', 'deploy', 'vizion', '--image', '${_DOCKER_ARTIFACTORY}${_TAG}', '--region', '$LOCATION', '--platform', 'managed']
+
+  # Step 4: Update Poetry dependencies and publish to custom repository
+  - name: 'python:3.10.13-slim'
     entrypoint: 'bash'
-    args:
+    args: 
       - '-c'
       - |
-        # if [[ "$TAG_NAME" = ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-        gcloud run deploy vizion \
-          --image=${_HOST_NAME}/${PROJECT_ID}/${_FOLDER}/${_IMAGE_NAME}:${_TEST} \
-          --platform=managed \
-          --region=${LOCATION} \
-          --allow-unauthenticated 
-        # fi
+        pip install poetry
+        poetry self update
+        poetry self add keyrings.google-artifactregistry-auth
+        poetry config repositories.dds-dev '${_PYTHON_ARTIFACTORY}'
+        poetry publish --build --repository dds-dev
+
+
+substitutions:
+  _DOCKER: docker
+  _PYTHON: python
+  _IMAGE_NAME: vizion
+  _TAG: tests41 # temporary tag to test the pipeline
+  _DOCKER_ARTIFACTORY: '${LOCATION}-${_DOCKER}.pkg.dev/${PROJECT_ID}/${_DOCKER}/${_IMAGE_NAME}:'
+  _PYTHON_ARTIFACTORY: 'https://${LOCATION}-${_PYTHON}.pkg.dev/${PROJECT_ID}/${_PYTHON}/'
+
 
 options:
- logging: CLOUD_LOGGING_ONLY
+  substitutionOption: 'ALLOW_LOOSE'
+  dynamicSubstitutions: true
+  logging: CLOUD_LOGGING_ONLY 
